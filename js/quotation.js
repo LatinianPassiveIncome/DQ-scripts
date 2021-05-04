@@ -132,7 +132,7 @@ function geoip(json){
     const options = {
       style: "currency",
       currency,
-      currencyDisplay: "narrowSymbol", // remove the country MX from the currency sign
+      // currencyDisplay: "narrowSymbol", // removes the country MX from the currency sign
     };
     if (prices.grey === undefined) {
       document.getElementById('grey-results-block').classList.add('hide');
@@ -142,8 +142,16 @@ function geoip(json){
       document.getElementById('title-color').classList.remove('hide');
     }
 
-    document.getElementById("price-natural").textContent = new Intl.NumberFormat('en-US', options).format(prices.grey);
-    document.getElementById("price-color").textContent = new Intl.NumberFormat("en-US", options).format(prices.color);
+    let textContentGrey = new Intl.NumberFormat('en-US', options).format(prices.grey);
+    let textContentColor = new Intl.NumberFormat("en-US", options).format(prices.color);
+
+    if (currency === "USD") {
+      textContentGrey = "US" + textContentGrey;
+      textContentColor = "US" + textContentColor;
+    }
+
+    document.getElementById("price-natural").textContent = textContentGrey;
+    document.getElementById("price-color").textContent = textContentColor;
   }
 
   function calculateEnsamblados(rug, shape, dim, currency, exchange, units = 188) {
@@ -201,8 +209,9 @@ function geoip(json){
       m2 = (parseInt(width) * parseInt(height)) / 10 ** 4;
       m2 = isNaN(m2) ? 0 : m2;
     } else {
-      const r = parseInt(dim) / 10 ** 2 / 2;
-      m2 = isNaN(r) ? 0 : Math.PI * r ** 2;
+      // Hexagono (no PI)
+      const d = parseInt(dim) / 10 ** 2 ;
+      m2 = isNaN(d) ? 0 : (((d / 2) * 6)*((d * 0.87) / 2))/2;
     }
     let type = corales.includes(rug) ? classification.classA : classification.classB;
     const margen = type.margen;
